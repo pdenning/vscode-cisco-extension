@@ -1,0 +1,44 @@
+{
+    "name": "ciscoconfig",
+    "displayName": "Cisco Configuration",
+    "version": "0.0.1",
+    "publisher": "Paul Denning",
+    "description": "Cisco Configutration Highlighter",
+    "author": {
+        "name": "Paul Denning",
+        "email": "padenning@outlook.com"
+    },
+    "engines": {
+        "vscode": "^1.5.0"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/pdenning/vscode-cisco-extension.git"
+    },
+    "categories": [
+        "Languages","Snippets","Formatters"
+    ],
+    "contributes": {
+        "configurationDefaults": {
+            "[Editor]":{
+                "editor.folding": false
+            }
+        },
+        "languages": [
+            {
+                "id": "ios",
+                "aliases": ["Cisco","IOS","IOS-XE","ASA"],
+                "extensions": ["txt","cfg","ios"],                
+                "configuration": "./language-configuration.json"
+            }
+        ],
+        "grammars": [{
+            "language": "ios",
+            "scopeName": "text.cisco.ios",
+            "path": "./syntaxes/cisco-ios.json"
+        }]
+    }
+
+    
+
+}

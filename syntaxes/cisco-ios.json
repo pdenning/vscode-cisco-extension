@@ -1,0 +1,197 @@
+{ 
+    "scopeName": "text.cisco.ios",
+    "name": "Cisco IOS",
+    "fileTypes": ["ios","txt","cfg"],
+    "patterns" :[
+        {
+            "match":"!.*",
+            "name":"comment.line.cisco"
+        },        
+        {
+            "match":"\\s*no .*$",
+            "name":"invalid.illegal.cisco"
+        },
+        {
+            "match":"\\s*shutdown\\s",
+            "name":"invalid.illegal.cisco"
+        },
+        {
+            "match":"^boot-([a-z-])*",
+            "name":"invalid.illegal.cisco"
+        },
+        {
+            "include" : "#sourceInterface"
+        },
+
+        {
+            "match": "^vlan|^line|^ntp|^vtp|^hostname|alias",
+            "name": "keyword.other.cisco"
+
+        },
+        { 
+            "begin" : "(ip route) ",
+            "beginCaptures": {
+                "1" : {"name" : "keyword.other.cisco"}
+            },
+            "end" : "((?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?))$",
+            "endCaptures" : {
+                "1" : {"name" : "entity.name.function.cisco"}
+            },
+            "patterns" : [
+                {"include" : "#ipv4"}
+            ]            
+        },
+    
+        {
+            "begin": "(^interface)(.*)",
+            "beginCaptures": {
+                "1" : {"name": "keyword.other.cisco"},
+                "2" : {"name": "constant.numeric.cisco"}
+            },
+            "end" : "^!$",
+            "patterns" : [
+                {
+                    "include": "#ipv4Address"
+                },
+                {
+                    "include": "#noCommand"
+                },                
+                {
+                    "match" : "^\\s(media-type|description|duplex|speed) ([a-zA-Z0-9\\W]*)",
+                    "captures": {
+                        "1" : {"name" : "keyword.other.cisco"},
+                        "2" : {"name": "entity.name.function.cisco"}
+                    }                
+                }, 
+
+                {
+                    "match":"\\s*shutdown\\s",
+                    "name":"invalid.illegal.cisco"
+                }
+            ]
+            
+            
+        },
+        {
+            "begin" : "(^router (?>bgp|ospf|eigrp))\\s?(.*)",
+            "beginCaptures" : {
+                "1" : {"name": "keyword.other.cisco"},            
+                "2" : {"name": "constant.numeric.cisco"}
+            },
+            "end" : "^!$",
+            "patterns" : [
+                {
+                    "include": "#ipv4"
+                },
+                {
+                    "include" : "#noCommand"
+                },                 
+                {
+                    "match" : "network|(exit-)*address-family|neighbor|(exit-)*af-(.*)",
+                    "name" : "keyword.other.cisco"
+
+                },
+                {
+                    "match" : "\\s*!",
+                    "name" : "comment.line.cisco"
+
+                },
+                {
+                    "match" : "(bgp|ospf|eigrp) (.*)",
+                    "name" : "keyword.other.cisco"
+                }             
+               
+            ]
+        },
+        {
+            "begin" : "^(aaa group server)\\s(ldap|radius|tacacs+)\\s(.*)",
+            "beginCaptures": {
+                "1" : {"name": "keyword.other.cisco"},
+                "2" : {"name": "entity.name.function.cisco"},
+                "3" : {"name": "constant.numeric.cisco"}
+            },
+            "end" : "^!$",    
+            "patterns" : [
+                {
+                    "match" : "^\\s(server-private\\s([\\d.]*)\\sauth-port\\s(\\d*)\\sacct-port\\s(\\d*)\\s.* ([\\d\\w]*))",
+                    "captures" : {
+                        "1" : {"name": "keyword.other.cisco"},
+                        "2" : {"name": "constant.numeric.cisco"},
+                        "3" : {"name": "constant.numeric.cisco"},
+                        "4" : {"name": "constant.numeric.cisco"},
+                        "5" : {"name": "constant.numeric.cisco"}
+                    }
+                }                
+            ]            
+        },
+        {
+            "match": "(^ip sla) (\\d*)$",
+            "captures": {
+                "1" : {"name": "keyword.other.cisco"},
+                "2" : {"name": "constant.numeric.cisco"}
+            }
+        },
+        {
+            "match": "(^access-list) (\\d*) (permit|deny)",
+            "captures": {
+                "1" : {"name": "keyword.other.cisco"},
+                "2" : {"name": "constant.numeric.cisco"},
+                "3" : {
+                    "patterns": [
+                        {
+                            "match" : "permit",
+                            "name": "entity.name.function.cisco"
+                        },
+                        {
+                            "match" : "deny",
+                            "name": "invalid.illegal.cisco"
+                        }                        
+                    ]
+                }
+            }
+        },
+        {
+            "include" : "#ipv4"
+        },
+        {
+            "include" : "#no"
+        }        
+        
+    ],
+
+    "repository" : {
+        "ipv4Address": { 
+            "begin" : "(ip address)",
+            "beginCaptures": {
+                "1" : {"name" : "keyword.other.cisco"}
+            },
+            "end" : "$",
+            "patterns" : [
+                {"include" : "#subnet"},
+                {"include" : "#ipv4"}
+            ]
+        },
+        "ipv4" : {
+            "match" : "(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)",
+            "name": "constant.numeric.cisco"
+
+        },
+        "subnet": {
+            "match" :  "(?:(?:255|254|252|248|240|224|192|128|0)\\.?){4}",
+            "name": "entity.name.function.cisco"
+        },
+        "noCommand" : {
+            "match":"\\s*no .*$",
+            "name":"invalid.illegal.cisco"
+        },
+        "sourceInterface" : {
+            "match" : "(.* source-interface) (.*)",
+            "captures" : {
+                "1":{"name":"keyword.other.cisco"},
+                "2": {"name": "constant.numeric.cisco"}
+            }
+        }
+    }
+
+    
+}
