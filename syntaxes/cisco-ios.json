@@ -24,12 +24,13 @@
         },
 
         {
-            "match": "^vlan|^line|^ntp|^vtp|^hostname|alias",
+            "match": "^vlan|^ntp|^vtp|^hostname|alias",
             "name": "keyword.other.cisco"
 
         },
+      
         { 
-            "begin" : "(ip route) ",
+            "begin" : "(^ip route )",
             "beginCaptures": {
                 "1" : {"name" : "keyword.other.cisco"}
             },
@@ -38,6 +39,10 @@
                 "1" : {"name" : "entity.name.function.cisco"}
             },
             "patterns" : [
+                {
+                    "match" : "vrf [A-Z]*",
+                    "name" : "constant.numeric.cisco"
+                },
                 {"include" : "#ipv4"}
             ]            
         },
@@ -62,7 +67,40 @@
                         "1" : {"name" : "keyword.other.cisco"},
                         "2" : {"name": "entity.name.function.cisco"}
                     }                
-                }, 
+                },
+                {
+                    "match" : "^\\s(encapsulation dot1Q) (\\d*)",
+                    "captures": {
+                        "1" : {"name" : "keyword.other.cisco"},
+                        "2" : {"name": "constant.numeric.cisco"}
+                    }                
+                },
+                {
+                    "match" : "^\\s*(switchport (access|trunk) vlan (\\d*))",
+                    "captures": {
+                        "1" : {"name" : "keyword.other.cisco"},
+                        "2" : {"name": "constant.numeric.cisco"},
+                        "3" : {"name": "constant.numeric.cisco"}
+                    }                
+                },                                   
+                {
+                    "match" : "^\\s(xconnect ([\\d.]*) (\\d*) [\\w ]*)",
+                    "captures": {
+                        "1" : {"name" : "keyword.other.cisco"},
+                        "2" : {
+                            "patterns":[
+                                {
+                                    "include" : "#ipv4"
+                                }
+                            ]
+                        },
+                        "3" : {"name": "entity.name.function.cisco"}
+
+                    }                
+                },                 
+                {
+                    "include": "#vrfForwarding"
+                },
 
                 {
                     "match":"\\s*shutdown\\s",
@@ -72,6 +110,81 @@
             
             
         },
+        {
+            "begin": "(^line)\\s(con)\\s(\\d*)",
+            "beginCaptures": {
+                "1" : {"name": "keyword.other.cisco"},
+                "2" : {"name": "constant.numeric.cisco"},
+                "3" : {"name": "entity.name.function.cisco"}
+            },
+            "end" : "^!$",
+            "patterns" : [
+                {
+                    "include": "#noCommand"
+                },   
+                {
+                    "match": "(^line)\\s(\\w*)\\s(\\d*)\\s(\\d*)",
+                    "captures": {
+                        "1" : {"name": "keyword.other.cisco"},
+                        "2" : {"name": "constant.numeric.cisco"},
+                        "3" : {"name": "entity.name.function.cisco"},
+                        "4" : {"name": "entity.name.function.cisco"}
+                    }
+                },
+                {
+                    "match" : "^\\s(privilege level) (\\d*)",
+                    "captures": {
+                        "1" : {"name" : "keyword.other.cisco"},
+                        "2" : {"name": "constant.numeric.cisco"}
+                    }                
+                },
+                {
+                    "match" : "^\\s(transport input) (\\w*,?)?(telnet|none)?,?(\\w*,?)?",
+                    "captures": {
+                        "1" : {"name" : "keyword.other.cisco"},
+                        "2" : {
+                            "patterns":[
+                                {
+                                    "include" : "#transportTypeTelnetNone"
+                                },
+                                {
+                                    "include" : "#transportTypeOther"
+                                }
+                            ]
+                        },
+                        "3" : {
+                            "patterns":[
+                                {
+                                    "include" : "#transportTypeTelnetNone"
+                                },
+                                {
+                                    "include" : "#transportTypeOther"
+                                }
+                            ]
+                        },
+                        "4" : {
+                            "patterns":[
+                                {
+                                    "include" : "#transportTypeTelnetNone"
+                                },
+                                {
+                                    "include" : "#transportTypeOther"
+                                }
+                            ]
+                        }                                              
+                    }                
+                },
+                {
+                    "match" : "^\\s(exec-timeout) (\\d*) (\\d*)",
+                    "captures": {
+                        "1" : {"name" : "keyword.other.cisco"},
+                        "2" : {"name": "constant.numeric.cisco"},
+                        "3" : {"name": "constant.numeric.cisco"}
+                    }                
+                }                
+
+            ]
+        },        
         {
             "begin" : "(^router (?>bgp|ospf|eigrp))\\s?(.*)",
             "beginCaptures" : {
@@ -97,7 +210,7 @@
 
                 },
                 {
-                    "match" : "(bgp|ospf|eigrp) (.*)",
+                    "match" : "^\\s*(bgp|ospf|eigrp) ([\\w-]*)",
                     "name" : "keyword.other.cisco"
                 }             
                
@@ -121,7 +234,10 @@
                         "4" : {"name": "constant.numeric.cisco"},
                         "5" : {"name": "constant.numeric.cisco"}
                     }
-                }                
+                },
+                {
+                    "include": "#vrfForwarding"
+                }            
             ]            
         },
         {
@@ -189,8 +305,27 @@
             "captures" : {
                 "1":{"name":"keyword.other.cisco"},
                 "2": {"name": "constant.numeric.cisco"}
+            }            
+        },
+
+        "transportTypeTelnetNone" : {
+            "match" : "(telnet|none)",
+            "name": "invalid.illegal.cisco"
+        },
+        "transportTypeOther" : {
+            "match" : "\\w*",
+            "name": "constant.numeric.cisco"
+        },
+
+        "vrfForwarding": {
+            "match": "(^\\s*(ip vrf forwarding) (.*))",
+            "captures": {
+                "1": {"name":"constant.numeric.cisco"},
+                "2": {"name":"keyword.other.cisco"}
             }
-        }
+
+        }         
+        
     }
 
     
